@@ -1,6 +1,5 @@
 set rtp+=.
 set rtp+=../plenary.nvim/
-set rtp+=../sqlite.lua/
 
 runtime! plugin/plenary.vim
-
+source scripts/minimal_init.lua
