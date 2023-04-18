@@ -243,23 +243,23 @@ local function org_drill_entry_lapsed_p(input)
 	return input.last_interval > 90
 
 	--	local now_time = tonumber(os.time())
-	--	local drill_interval = (now_time - input.drill_lasttime) / 60 / 60 / 24
+	--	local drill_interval = (now_time - input.lasttime) / 60 / 60 / 24
 	--	local lapsed_days = 90
 	--	return (drill_interval or 0) > lapsed_days
 end
 
 local function wrap(quality, input, of_matrix)
 	local now_time = tonumber(os.time())
-	--local drill_interval = (now_time - input.drill_lasttime) / 60 / 60 / 24
-	local delta_days = (input.drill_schedule - now_time) / 60 / 60 / 24
+	--local drill_interval = (now_time - input.lasttime) / 60 / 60 / 24
+	local delta_days = (input.schedule - now_time) / 60 / 60 / 24
 	return sm5(
 		input.last_interval,
-		input.drill_n,
-		input.drill_ef,
+		input.n,
+		input.ef,
 		quality,
-		input.drill_failures,
-		input.drill_meanq,
-		input.drill_total_repeats,
+		input.failures,
+		input.meanq,
+		input.total_repeats,
 		of_matrix,
 		delta_days
 	)
@@ -313,7 +313,7 @@ local function org_drill_smart_reschedule(quality, days_ahead, input, of_matrix)
 	if days_ahead <= 0 then
 		schedule_time = os.time() + math.random(10) * 60
 	else
-		schedule_time = math.max(os.time(), tonumber(input.drill_schedule)) + next_interval * 24 * 60 * 60
+		schedule_time = math.max(os.time(), tonumber(input.schedule)) + next_interval * 24 * 60 * 60
 	end
 
 	schedule_time = math.min(os.time() + 90 * 24 * 60 * 60, schedule_time)
