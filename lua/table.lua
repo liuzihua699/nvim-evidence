@@ -55,6 +55,54 @@ function SqlTableImpl:setup(data)
   self.sqlite(tools.merge(uri_map, self.all_table))
 end
 
+---@param obj table<string,any>
+function SqlTableImpl:insert(obj)
+  self.now_table:insert(obj)
+end
+
+function SqlTableImpl:editById(id, row)
+  return self.now_table:update({
+    where = { id = id },
+    set = row,
+  })
+end
+
+function SqlTableImpl:drop()
+  self.now_table:drop()
+end
+
+-- convert empty table to nil
+---@param item nil | table
+---@return nil | table
+function SqlTableImpl:convert_empty_table(item)
+  local ret = item
+  if item == nil or (type(item) == "table" and #item == 1 and next(item[1]) == nil) then
+    ret = nil
+  end
+  return ret
+end
+
+---@param query string
+---@return nil | table
+function SqlTableImpl:eval(query)
+  local item = self.now_table:eval(query)
+  return self:convert_empty_table(item)
+end
+
+---@param limit_num number
+---@param statement string | nil
+---@return nil | table
+function SqlTableImpl:find(limit_num, statement)
+  local query = "SELECT * FROM " .. self.now_table_id
+  if statement ~= nil then
+    query = query .. " where " .. statement
+  end
+  if limit_num ~= -1 then
+    query = query .. " LIMIT " .. limit_num
+  end
+  return self:eval(query)
+end
+
 ---@class SqlTable
 ---@field _ SqlTableImpl
 ---@field is_setup boolean
@@ -103,10 +151,29 @@ function SqlTable:getInfo()
   }
 end
 
-function SqlTable:release()
-  self.instance.is_setup = false
-  self.instance = nil
-  self._ = nil
+--function SqlTable:release()
+--  self.instance.is_setup = false
+--  self.instance = nil
+--  self._ = nil
+--end
+
+function SqlTable:addContent(content)
+  self._:insert({ content = content })
 end
 
-return SqlTable
+---@param id number
+---@param row table
+function SqlTable:editById(id, row)
+  self._:editById(id, row)
+end
+
+function SqlTable:drop()
+  self._:drop()
+end
+
+---@return nil | table
+function SqlTable:findAll()
+  return self._:find(-1, nil)
+end
+
+return SqlTable:getInstance()
