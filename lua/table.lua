@@ -1,6 +1,32 @@
 local tools = require("lua.tools")
 require("lua.dump")
 
+local now_time = os.time()
+
+---@class EvidenceTableField
+---@field id number
+---@field content string
+---@field scheduel number
+---@field lasttime number
+---@field ef number
+---@field n number
+---@field failures number
+---@field meanq number
+---@field total_repeats number
+---@field weight number
+local EvidenceTableField = {
+  id = 0, -- same as { type = "integer", required = true, primary = true }
+  content = "text",
+  lasttime = now_time,
+  schedule = now_time,
+  ef = 0,
+  n = 0, -- new card mark
+  failures = 0,
+  meanq = 0,
+  total_repeats = 0,
+  weight = 1,
+}
+
 ---@class SqlTableImpl
 ---@field sqlite any
 ---@field tbl any
@@ -23,14 +49,14 @@ function SqlTableImpl:new()
   self.table_field = {
     id = true, -- same as { type = "integer", required = true, primary = true }
     content = { "text", required = true },
-    schedule = { "number", default = tonumber(os.time()) },
-    lasttime = { "number", default = tonumber(os.time()) },
-    ef = { "number", default = 0 },
-    n = { "number", default = 0 }, -- new card mark
-    failures = { "number", default = 0 },
-    meanq = { "number", default = 0 },
-    total_repeats = { "number", default = 0 },
-    weight = { "number", default = 1 },
+    schedule = { "number", default = EvidenceTableField.schedule },
+    lasttime = { "number", default = EvidenceTableField.lasttime },
+    ef = { "number", default = EvidenceTableField.ef },
+    n = { "number", default = EvidenceTableField.n }, -- new card mark
+    failures = { "number", default = EvidenceTableField.failures },
+    meanq = { "number", default = EvidenceTableField.meanq },
+    total_repeats = { "number", default = EvidenceTableField.total_repeats },
+    weight = { "number", default = EvidenceTableField.weight },
   }
   self.all_table = {}
   return setmetatable({}, self)
@@ -91,7 +117,7 @@ end
 
 ---@param limit_num number
 ---@param statement string | nil
----@return nil | table
+---@return nil | EvidenceTableField[]
 function SqlTableImpl:find(limit_num, statement)
   local query = "SELECT * FROM " .. self.now_table_id
   if statement ~= nil then
@@ -101,6 +127,11 @@ function SqlTableImpl:find(limit_num, statement)
     query = query .. " LIMIT " .. limit_num
   end
   return self:eval(query)
+end
+
+---@param id number
+function SqlTableImpl:del(id)
+  self.now_table:remove({ id = id })
 end
 
 ---@class SqlTable
@@ -171,9 +202,15 @@ function SqlTable:drop()
   self._:drop()
 end
 
----@return nil | table
+---@return nil | EvidenceTableField[]
 function SqlTable:findAll()
   return self._:find(-1, nil)
+end
+
+---@param id number
+function SqlTable:del(id)
+  self._:del(id)
+  return true
 end
 
 return SqlTable:getInstance()
