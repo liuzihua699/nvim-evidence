@@ -134,13 +134,42 @@ function SqlTableImpl:del(id)
   self.now_table:remove({ id = id })
 end
 
+---@param column number
+---@param statement string | nil
+---@return nil | EvidenceTableField
+function SqlTableImpl:min(column, statement)
+  local query = "SELECT *, MIN(" .. column .. ") AS `rowmin` FROM " .. self.now_table_id
+  if statement ~= nil then
+    query = query .. " where " .. statement
+  end
+  local ret = self:eval(query)
+  if ret ~= nil then
+    return ret[1]
+  else
+    return nil
+  end
+end
+
+---@param id string
+---@return boolean
+function SqlTableImpl:setTable(id)
+  if tools.isInTable(id, self.all_table_id) then
+    self.now_table_id = id
+    self.now_table = self.all_table[self.now_table_id]
+    return true
+  end
+  return false
+end
+
+---------------------------------------------------------------------------
+---------------------------------------------------------------------------
+---------------------------------------------------------------------------
+
 ---@class SqlTable
 ---@field _ SqlTableImpl
 ---@field is_setup boolean
 ---@field now_table_id number
 ---@field instance SqlTable
----@field setup function
----@field getInfo function
 local SqlTable = {}
 
 SqlTable.__index = function(self, key)
@@ -174,6 +203,7 @@ function SqlTable:setup(data)
   self._:setup(data)
 end
 
+---@return table<string,any>
 function SqlTable:getInfo()
   return {
     uri = self._.uri,
@@ -188,6 +218,7 @@ end
 --  self._ = nil
 --end
 
+---@param content string
 function SqlTable:addContent(content)
   self._:insert({ content = content })
 end
@@ -213,4 +244,27 @@ function SqlTable:del(id)
   return true
 end
 
+---@param column number
+---@param statement string | nil
+---@return nil | EvidenceTableField
+function SqlTable:min(column, statement)
+  return self._:min(column, statement)
+end
+
+---@param id string
+---@return boolean
+function SqlTable:setTable(id)
+  return self._:setTable(id)
+end
+
+---@class SqlTable
+---@field setup function
+---@field getInfo function
+---@field addContent function
+---@field editById function
+---@field drop function
+---@field findAll function
+---@field del function
+---@field min function
+---@field setTable function
 return SqlTable:getInstance()
