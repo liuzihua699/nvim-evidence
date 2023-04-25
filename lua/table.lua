@@ -3,10 +3,16 @@ require("lua.dump")
 
 local now_time = os.time()
 
+---@class SqlInfo
+---@field uri string
+---@field all_table_id table<string>
+---@field now_table_id string
+local SqlInfo = {}
+
 ---@class EvidenceTableField
 ---@field id number
 ---@field content string
----@field scheduel number
+---@field schedule number
 ---@field lasttime number
 ---@field ef number
 ---@field n number
@@ -62,6 +68,7 @@ function SqlTableImpl:new()
   return setmetatable({}, self)
 end
 
+---@param data SqlInfo
 function SqlTableImpl:setup(data)
   assert(data.uri ~= nil, "uri required")
   assert(type(data.all_table_id) == "table", "all_table_id required table")
@@ -86,6 +93,9 @@ function SqlTableImpl:insert(obj)
   self.now_table:insert(obj)
 end
 
+---@param id number
+---@param row table
+---@return boolean
 function SqlTableImpl:editById(id, row)
   return self.now_table:update({
     where = { id = id },
@@ -93,26 +103,18 @@ function SqlTableImpl:editById(id, row)
   })
 end
 
-function SqlTableImpl:drop()
-  self.now_table:drop()
-end
-
--- convert empty table to nil
----@param item nil | table
----@return nil | table
-function SqlTableImpl:convert_empty_table(item)
-  local ret = item
-  if item == nil or (type(item) == "table" and #item == 1 and next(item[1]) == nil) then
-    ret = nil
-  end
-  return ret
-end
-
 ---@param query string
 ---@return nil | table
 function SqlTableImpl:eval(query)
   local item = self.now_table:eval(query)
-  return self:convert_empty_table(item)
+  if tools.isTableEmpty(item) then
+    return nil
+  end
+  return item
+end
+
+function SqlTableImpl:clear()
+  return self:eval("delete from " .. self.now_table_id)
 end
 
 ---@param limit_num number
@@ -126,7 +128,11 @@ function SqlTableImpl:find(limit_num, statement)
   if limit_num ~= -1 then
     query = query .. " LIMIT " .. limit_num
   end
-  return self:eval(query)
+  local ret = self:eval(query)
+  if type(ret) ~= "table" then
+    return nil
+  end
+  return ret
 end
 
 ---@param id number
@@ -155,7 +161,7 @@ end
 function SqlTableImpl:setTable(id)
   if tools.isInTable(id, self.all_table_id) then
     self.now_table_id = id
-    self.now_table = self.all_table[self.now_table_id]
+    self.now_table = self.all_table[id]
     return true
   end
   return false
@@ -194,7 +200,7 @@ function SqlTable:getInstance()
   return self.instance
 end
 
----@param data table<string,any>
+---@param data SqlInfo
 function SqlTable:setup(data)
   if self.is_setup then
     error("cannot setup twice")
@@ -203,7 +209,7 @@ function SqlTable:setup(data)
   self._:setup(data)
 end
 
----@return table<string,any>
+---@return SqlInfo
 function SqlTable:getInfo()
   return {
     uri = self._.uri,
@@ -225,17 +231,26 @@ end
 
 ---@param id number
 ---@param row table
+---@return boolean
 function SqlTable:editById(id, row)
-  self._:editById(id, row)
-end
-
-function SqlTable:drop()
-  self._:drop()
+  return self._:editById(id, row)
 end
 
 ---@return nil | EvidenceTableField[]
 function SqlTable:findAll()
   return self._:find(-1, nil)
+end
+
+---@param id number
+---@return nil | EvidenceTableField
+function SqlTable:findById(id)
+  local ret = self._:find(1, "id=" .. id)
+  if ret ~= nil then
+    return ret[1]
+  else
+    error("findById not exist id:" .. id)
+    return nil
+  end
 end
 
 ---@param id number
@@ -257,14 +272,8 @@ function SqlTable:setTable(id)
   return self._:setTable(id)
 end
 
----@class SqlTable
----@field setup function
----@field getInfo function
----@field addContent function
----@field editById function
----@field drop function
----@field findAll function
----@field del function
----@field min function
----@field setTable function
+function SqlTable:clear()
+  return self._:clear()
+end
+
 return SqlTable:getInstance()

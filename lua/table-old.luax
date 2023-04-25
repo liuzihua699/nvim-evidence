@@ -286,8 +286,6 @@ local function del(id)
   current_table:remove({ id = id })
 end
 
-return SqlTable
-
 return {
   min = min,
   setQuality = setQuality,

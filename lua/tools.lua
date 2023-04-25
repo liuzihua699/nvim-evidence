@@ -50,9 +50,34 @@ local function str2table(str)
   return lines
 end
 
+--- check {{{}}}
+function isTableEmpty(t, visited)
+  if type(t) ~= "table" then
+    return false
+  end
+  visited = visited or {} -- 初始化 visited 表
+  if visited[t] then
+    return true          -- 如果 t 已经被访问过，认为它是空表
+  end
+  visited[t] = true      -- 将 t 加入 visited 表中
+  for _, v in pairs(t) do
+    if type(v) == "table" then
+      if not isTableEmpty(v, visited) then
+        return false
+      end
+    else
+      if v ~= nil then
+        return false
+      end
+    end
+  end
+  return true
+end
+
 return {
   isInTable = isInTable,
   table_concat = table_concat,
   merge = merge,
   str2table = str2table,
+  isTableEmpty = isTableEmpty,
 }
