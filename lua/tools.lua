@@ -74,10 +74,26 @@ function isTableEmpty(t, visited)
   return true
 end
 
+---@return integer
+function parseDate(date_string, date_format)
+  local year, month, day, hour, minute, second = date_string:match(date_format)
+  local date_table = {
+    year = tonumber(year),
+    month = tonumber(month),
+    day = tonumber(day),
+    hour = tonumber(hour),
+    min = tonumber(minute),
+    sec = tonumber(second),
+  }
+  assert(isTableEmpty(date_table) == false)
+  return os.time(date_table)
+end
+
 return {
   isInTable = isInTable,
   table_concat = table_concat,
   merge = merge,
   str2table = str2table,
   isTableEmpty = isTableEmpty,
+  parseDate = parseDate,
 }
