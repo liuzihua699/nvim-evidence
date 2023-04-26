@@ -1,5 +1,4 @@
 local tools = require("lua.tools")
-require("lua.dump")
 
 local now_time = os.time()
 
