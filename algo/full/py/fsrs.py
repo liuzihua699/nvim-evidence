@@ -1,4 +1,4 @@
-from .models import *
+from models import *
 import math
 
 
@@ -76,8 +76,8 @@ class FSRS:
         return min(max(self.p.w[2] + self.p.w[3] * (r - 2), 1), 10)
 
     def next_interval(self, s: float) -> int:
-        State.New_interval = s * math.log(self.p.request_retention) / math.log(0.9)
-        return min(max(round(State.New_interval), 1), self.p.maximum_interval)
+        New_interval = s * math.log(self.p.request_retention) / math.log(0.9)
+        return min(max(round(New_interval), 1), self.p.maximum_interval)
 
     def next_difficulty(self, d: float, r: int) -> float:
         next_d = d + self.p.w[4] * (r - 2)
@@ -94,4 +94,3 @@ class FSRS:
 
     def next_forget_stability(self, d: float, s: float, r: float) -> float:
         return self.p.w[9] * math.pow(d, self.p.w[10]) * math.pow(s, self.p.w[11]) * math.exp((1 - r) * self.p.w[12])
-
