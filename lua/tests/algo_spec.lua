@@ -112,29 +112,30 @@ describe("algo", function()
   it("fsrs", function()
     local f = fsrs.FSRS:new()
     local card = fsrs.Card:new()
-    local now = os.time()
+    --local now = os.time()
+    local now = os.time({ year = 2022, month = 11, day = 29, hour = 12, min = 30, sec = 0 })
+
     local scheduling_cards = f:repeats(card, now)
     print_scheduling_cards(scheduling_cards)
 
-    
-    card = scheduling_cards[fsrs.Rating.Good].card
-    now = card.due
-    scheduling_cards = f:repeats(card, now)
-    print_scheduling_cards(scheduling_cards)
+    --card = scheduling_cards[fsrs.Rating.Good].card
+    --now = card.due
+    --scheduling_cards = f:repeats(card, now)
+    --print_scheduling_cards(scheduling_cards)
 
-    card = scheduling_cards[fsrs.Rating.Good].card
-    now = card.due
-    scheduling_cards = f:repeats(card, now)
-    print_scheduling_cards(scheduling_cards)
+    --card = scheduling_cards[fsrs.Rating.Good].card
+    --now = card.due
+    --scheduling_cards = f:repeats(card, now)
+    --print_scheduling_cards(scheduling_cards)
 
-    card = scheduling_cards[fsrs.Rating.Again].card
-    now = card.due
-    scheduling_cards = f:repeats(card, now)
-    print_scheduling_cards(scheduling_cards)
+    --card = scheduling_cards[fsrs.Rating.Again].card
+    --now = card.due
+    --scheduling_cards = f:repeats(card, now)
+    --print_scheduling_cards(scheduling_cards)
 
-    card = scheduling_cards[fsrs.Rating.Good].card
-    now = card.due
-    scheduling_cards = f:repeats(card, now)
-    print_scheduling_cards(scheduling_cards)
+    --card = scheduling_cards[fsrs.Rating.Good].card
+    --now = card.due
+    --scheduling_cards = f:repeats(card, now)
+    --print_scheduling_cards(scheduling_cards)
   end)
 end)
