@@ -1,0 +1,20 @@
+local _ = require("lua.fsrs_models")
+local tools = require("lua.tools")
+
+local eq = function(a, b)
+	assert.are.same(a, b)
+end
+
+describe("fsrs", function()
+	it("fsrs_model", function()
+		local card = _.Card:new()
+		local info = _.SchedulingInfo:new(card)
+		local cards = _.SchedulingCards:new(card)
+		--dump(card)
+		--dump(info)
+		tools.dump(cards)
+		cards:update_state(_.State.New)
+    print("-======")
+		tools.dump(cards)
+	end)
+end)
