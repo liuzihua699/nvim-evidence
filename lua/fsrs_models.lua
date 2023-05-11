@@ -35,7 +35,16 @@ local Card = {}
 
 ---@return Card
 function Card:copy()
-	return tools.copy(self)
+	local newCard = Card:new()
+	return tools.merge(newCard, tools.copy(self))
+end
+
+function Card:dump()
+	local format = "%Y-%m-%d %H:%M:%S"
+	tools.dump(tools.merge(self:copy(), {
+		last_review_date = os.date(format, self.last_review),
+		due_date = os.date(format, self.due),
+	}))
 end
 
 function Card:new()
@@ -55,6 +64,19 @@ function Card:new()
 	return obj
 end
 
+--- @class SchedulingInfo
+--- @field card Card
+local SchedulingInfo = {}
+
+function SchedulingInfo:new(card)
+	local obj = {
+		card = card:copy(),
+	}
+	setmetatable(obj, self)
+	self.__index = self
+	return obj
+end
+
 --- @class SchedulingCards
 --- @field again Card
 --- @field hard Card
@@ -63,13 +85,13 @@ end
 local SchedulingCards = {}
 
 ---@param card Card
----@return SchedulingCards 
+---@return SchedulingCards
 function SchedulingCards:new(card)
 	local obj = {
-		again = tools.copy(card),
-		hard = tools.copy(card),
-		good = tools.copy(card),
-		easy = tools.copy(card),
+		again = card:copy(),
+		hard = card:copy(),
+		good = card:copy(),
+		easy = card:copy(),
 	}
 	setmetatable(obj, self)
 	self.__index = self
@@ -98,17 +120,33 @@ function SchedulingCards:update_state(state)
 	end
 end
 
---- @class SchedulingInfo
---- @field card Card
-local SchedulingInfo = {}
+---@param now Timestamp
+---@param hard_interval Days
+---@param good_interval Days
+---@param easy_interval Days
+function SchedulingCards:schedule(now, hard_interval, good_interval, easy_interval)
+	self.again.scheduled_days = 0
+	self.hard.scheduled_days = hard_interval
+	self.good.scheduled_days = good_interval
+	self.easy.scheduled_days = easy_interval
+	self.again.due = now + 5 * 60
+	if hard_interval > 0 then
+		self.hard.due = now + hard_interval * 24 * 3600
+	else
+		self.hard.due = now + 10 * 60
+	end
+	self.good.due = now + good_interval * 24 * 3600
+	self.easy.due = now + easy_interval * 24 * 3600
+end
 
-function SchedulingInfo:new(card)
-	local obj = {
-		card = tools.copy(card),
+---@return table<RatingType,SchedulingInfo>
+function SchedulingCards:record_log()
+	return {
+		[Rating.Again] = SchedulingInfo:new(self.again),
+		[Rating.Hard] = SchedulingInfo:new(self.hard),
+		[Rating.Good] = SchedulingInfo:new(self.good),
+		[Rating.Easy] = SchedulingInfo:new(self.easy),
 	}
-	setmetatable(obj, self)
-	self.__index = self
-	return obj
 end
 
 return {

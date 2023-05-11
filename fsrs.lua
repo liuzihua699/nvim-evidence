@@ -120,7 +120,7 @@ function FSRS:repeats(card_, now)
     local good_interval = self:next_interval(s.good.stability)
     hard_interval = math.min(hard_interval, good_interval)
     good_interval = math.max(good_interval, hard_interval + 1)
-    local easy_interval = math.max(self:next_interval(s.easy.stability * self.p.hard_factor), good_interval + 1)
+    local easy_interval = math.max(self:next_interval(s.easy.stability * self.p.easy_bonus), good_interval + 1)
     s:schedule(now, hard_interval, good_interval, easy_interval)
   end
   return s:record_log(card, now)
