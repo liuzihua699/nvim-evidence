@@ -1,6 +1,6 @@
-local _ = require("lua.fsrs_models")
 local fsrs = require("lua.fsrs")
 local tools = require("lua.tools")
+local _ = fsrs.MODEL
 
 local eq = function(a, b)
 	assert.are.same(a, b)
@@ -43,21 +43,39 @@ describe("fsrs", function()
 		card = scheduling_cards[_.Rating.Good].card
 		now = card.due
 		scheduling_cards = f:repeats(card, now)
-		--printFSRS(scheduling_cards)
     --
 		card = scheduling_cards[_.Rating.Good].card
 		now = card.due
 		scheduling_cards = f:repeats(card, now)
-		--printFSRS(scheduling_cards)
     --
 		card = scheduling_cards[_.Rating.Again].card
 		now = card.due
 		scheduling_cards = f:repeats(card, now)
-		--printFSRS(scheduling_cards)
     --
 		card = scheduling_cards[_.Rating.Good].card
 		now = card.due
 		scheduling_cards = f:repeats(card, now)
+
+---------------
+---------------
+---------------
+
+		card = scheduling_cards[_.Rating.Again].card
+		now = card.due
+		scheduling_cards = f:repeats(card, now)
+
+		card = scheduling_cards[_.Rating.Easy].card
+		now = card.due
+		scheduling_cards = f:repeats(card, now)
+
+		card = scheduling_cards[_.Rating.Hard].card
+		now = card.due
+		scheduling_cards = f:repeats(card, now)
+
+		card = scheduling_cards[_.Rating.Good].card
+		now = card.due
+		scheduling_cards = f:repeats(card, now)
+
 		printFSRS(scheduling_cards)
 	end)
 end)

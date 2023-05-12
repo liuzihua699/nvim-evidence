@@ -51,7 +51,7 @@ local function str2table(str)
 end
 
 --- check {{{}}}
-function isTableEmpty(t, visited)
+local function isTableEmpty(t, visited)
 	if type(t) ~= "table" then
 		return false
 	end
@@ -75,7 +75,7 @@ function isTableEmpty(t, visited)
 end
 
 ---@return integer
-function parseDate(date_string, date_format)
+local function parseDate(date_string, date_format)
 	local year, month, day, hour, minute, second = date_string:match(date_format)
 	local date_table = {
 		year = tonumber(year),
@@ -89,26 +89,26 @@ function parseDate(date_string, date_format)
 	return os.time(date_table)
 end
 
-function copy(orig)
-	local copy = {}
+local function copy(orig)
+	local copy_item = {}
 	for k, v in pairs(orig) do
-		copy[k] = v
+		copy_item[k] = v
 	end
-	return copy
+	return copy_item
 end
 
-function deepCopy(orig)
-	local copy
+local function deepCopy(orig)
+	local copy_item
 	if type(orig) == "table" then
-		copy = {}
+		copy_item = {}
 		for k, v in next, orig, nil do
-			copy[deepCopy(k)] = deepCopy(v)
+			copy_item[deepCopy(k)] = deepCopy(v)
 		end
-		setmetatable(copy, deepCopy(getmetatable(orig)))
+		setmetatable(copy_item, deepCopy(getmetatable(orig)))
 	else -- number, string, boolean, etc
-		copy = orig
+		copy_item = orig
 	end
-	return copy
+	return copy_item
 end
 
 local function dump(obj)

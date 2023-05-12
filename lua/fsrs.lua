@@ -1,34 +1,21 @@
 local _ = require("lua.fsrs_models")
 local tools = require("lua.tools")
 
---- @class Parameters
---- @field request_retention number
---- @field maximum_interval number
---- @field easy_bonus number
---- @field hard_factor number
---- @field w table<number>
-local Parameters = {}
-
-function Parameters:new()
-	local obj = {
-		request_retention = 0.9,
-		maximum_interval = 36500,
-		easy_bonus = 1.3,
-		hard_factor = 1.2,
-		w = { 1.0, 1.0, 5.0, -0.5, -0.5, 0.2, 1.4, -0.12, 0.8, 2.0, -0.2, 0.2, 1.0 },
-	}
-	setmetatable(obj, self)
-	self.__index = self
-	return obj
-end
-
 --- @class FSRS
 --- @field p Parameters
 local FSRS = {}
 
-function FSRS:new()
+--- @param p? Parameters
+--- @return FSRS
+function FSRS:new(p)
+	local p_ = nil
+	if p ~= nil then
+		p_ = p:copy()
+	else
+		p_ = _.Parameters:new()
+	end
 	local obj = {
-		p = Parameters:new(),
+		p = p_,
 	}
 	setmetatable(obj, self)
 	self.__index = self
@@ -153,4 +140,5 @@ end
 
 return {
 	FSRS = FSRS,
+	MODEL = _,
 }

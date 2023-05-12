@@ -18,41 +18,66 @@ func Example() {
 	schedulingCards := p.Repeat(card, now)
 	schedule, _ := json.MarshalIndent(schedulingCards, "", "  ")
 	//fmt.Println(string(schedule))
-	fmt.Println("")
-	fmt.Println("====================")
-	fmt.Println("")
+	//fmt.Println("")
+	//fmt.Println("====================")
+	//fmt.Println("")
 
 	card = schedulingCards[Good].Card
 	now = card.Due
 	schedulingCards = p.Repeat(card, now)
 	schedule, _ = json.MarshalIndent(schedulingCards, "", "  ")
 	//fmt.Println(string(schedule))
-	fmt.Println("")
-	fmt.Println("====================")
-	fmt.Println("")
+	//fmt.Println("")
+	//fmt.Println("====================")
+	//fmt.Println("")
 	//
 	card = schedulingCards[Good].Card
 	now = card.Due
 	schedulingCards = p.Repeat(card, now)
 	schedule, _ = json.MarshalIndent(schedulingCards, "", "  ")
 	//fmt.Println(string(schedule))
-	fmt.Println("")
-	fmt.Println("====================")
-	fmt.Println("")
+	//fmt.Println("")
+	//fmt.Println("====================")
+	//fmt.Println("")
 	
 	card = schedulingCards[Again].Card
 	now = card.Due
 	schedulingCards = p.Repeat(card, now)
 	schedule, _ = json.MarshalIndent(schedulingCards, "", "  ")
 	//fmt.Println(string(schedule))
-	fmt.Println("")
-	fmt.Println("====================")
-	fmt.Println("")
+	//fmt.Println("")
+	//fmt.Println("====================")
+	//fmt.Println("")
 	
 	card = schedulingCards[Good].Card
 	now = card.Due
 	schedulingCards = p.Repeat(card, now)
 	schedule, _ = json.MarshalIndent(schedulingCards, "", "  ")
-	fmt.Println(string(schedule))
+	//fmt.Println(string(schedule))
 
+  //////////
+  //////////
+
+
+	card = schedulingCards[Again].Card
+	now = card.Due
+	schedulingCards = p.Repeat(card, now)
+	schedule, _ = json.MarshalIndent(schedulingCards, "", "  ")
+
+	card = schedulingCards[Easy].Card
+	now = card.Due
+	schedulingCards = p.Repeat(card, now)
+	schedule, _ = json.MarshalIndent(schedulingCards, "", "  ")
+
+	card = schedulingCards[Hard].Card
+	now = card.Due
+	schedulingCards = p.Repeat(card, now)
+	schedule, _ = json.MarshalIndent(schedulingCards, "", "  ")
+
+	card = schedulingCards[Good].Card
+	now = card.Due
+	schedulingCards = p.Repeat(card, now)
+	schedule, _ = json.MarshalIndent(schedulingCards, "", "  ")
+
+	fmt.Println(string(schedule))
 }

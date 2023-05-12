@@ -149,10 +149,38 @@ function SchedulingCards:record_log()
 	}
 end
 
+--- @class Parameters
+--- @field request_retention number
+--- @field maximum_interval number
+--- @field easy_bonus number
+--- @field hard_factor number
+--- @field w table<number>
+local Parameters = {}
+
+function Parameters:new()
+	local obj = {
+		request_retention = 0.9,
+		maximum_interval = 36500,
+		easy_bonus = 1.3,
+		hard_factor = 1.2,
+		w = { 1.0, 1.0, 5.0, -0.5, -0.5, 0.2, 1.4, -0.12, 0.8, 2.0, -0.2, 0.2, 1.0 },
+	}
+	setmetatable(obj, self)
+	self.__index = self
+	return obj
+end
+
+---@return Parameters
+function Parameters:copy()
+	local new_p = Parameters:new()
+	return tools.merge(new_p, tools.copy(self))
+end
+
 return {
 	SchedulingInfo = SchedulingInfo,
 	Rating = Rating,
 	State = State,
 	Card = Card,
 	SchedulingCards = SchedulingCards,
+	Parameters = Parameters,
 }
