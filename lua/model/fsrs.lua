@@ -1,5 +1,5 @@
-local _ = require("lua.fsrs_models")
-local tools = require("lua.tools")
+local _ = require("lua.model.fsrs_models")
+local tools = require("lua.util.tools")
 
 --- @class FSRS
 --- @field p Parameters
