@@ -1,13 +1,19 @@
-local SqlTableImpl = require("lua.model.table")
-local FSRS = require("lua.model.fsrs")
-local fsrs = FSRS.FSRS
-local _ = FSRS.MODEL
+local SqlTable = require("lua.model.table")
+local _FSRS_ = require("lua.model.fsrs")
+local _ = _FSRS_.model
+local tools = require("lua.util.tools")
+
+---@class ModelTableInfo
+---@field uri string
+---@field all_table table<string,Parameters|{}>
+---@field now_table_id string
 
 ---@class Model
----@field _ SqlTableImpl
+---@field tbl SqlTable
 ---@field is_setup boolean
 ---@field now_table_id number
 ---@field instance Model
+---@field all_table table<string,Parameters>
 local Model = {}
 
 Model.__index = function(self, key)
@@ -26,75 +32,80 @@ end
 
 function Model:getInstance()
   if not self.instance then
-    self._ = SqlTableImpl:new()
+    self.tbl = SqlTable:new()
+    self.all_table = {}
     self.instance = setmetatable({ is_setup = false }, self)
   end
   return self.instance
 end
 
----@param data SqlInfo
+---@param data ModelTableInfo
 function Model:setup(data)
   if self.is_setup then
     error("cannot setup twice")
   end
   self.is_setup = true
-  self._:setup(data)
+  local all_id = {}
+  for key, item in pairs(data.all_table) do
+    self.all_table[key] = _.Parameters:new(item)
+    table.insert(all_id, key)
+  end
+  local sql_info = {
+    uri = data.uri,
+    now_table_id = data.now_table_id,
+    all_table_id = all_id,
+  }
+  self.tbl:setup(sql_info)
 end
 
----@return SqlInfo
-function Model:getInfo()
+---@return ModelTableInfo
+function Model:getAllInfo()
   return {
-    uri = self._.uri,
-    now_table_id = self._.now_table_id,
-    all_table_id = self._.all_table_id,
+    uri = self.tbl.uri,
+    now_table_id = self.tbl.now_table_id,
+    all_table = self.all_table,
+    sql_table = self.tbl:dump(),
   }
 end
 
 --function Model:release()
 --  self.instance.is_setup = false
 --  self.instance = nil
---  self._ = nil
+--  self.tbl = nil
 --end
 
------@param content string
---function Model:addContent(content)
---  self._:insert({ content = content })
---end
---
 ---@param content string
----@param info string
----@param schedule number
-function Model:addCard(content, info, schedule)
-  self._:insert({ content = content, info = info, schedule = schedule })
+function Model:addNewCard(content)
+  local card_info = _.Card:new()
+  self.tbl:insertCard(content, card_info:dumpStr(), card_info.due)
 end
 
 ---@param id number
 ---@param row table
 ---@return boolean
-function Model:editById(id, row)
-  return self._:editById(id, row)
+function Model:editCard(id, row)
+  return self.tbl:editById(id, row)
 end
 
 ---@return nil | FsrsTableField[]
 function Model:findAll()
-  return self._:find(-1, nil)
+  return self.tbl:find(-1, nil)
 end
 
 ---@param id number
----@return nil | FsrsTableField
+---@return FsrsTableField
 function Model:findById(id)
-  local ret = self._:find(1, "id=" .. id)
+  local ret = self.tbl:find(1, "id=" .. id)
   if ret ~= nil then
     return ret[1]
   else
     error("findById not exist id:" .. id)
-    return nil
   end
 end
 
 ---@param id number
-function Model:del(id)
-  self._:del(id)
+function Model:delCard(id)
+  self.tbl:del(id)
   return true
 end
 
@@ -102,17 +113,48 @@ end
 ---@param statement string | nil
 ---@return nil | FsrsTableField
 function Model:min(column, statement)
-  return self._:min(column, statement)
+  return self.tbl:min(column, statement)
 end
 
----@param id string
+---@param table_id string
 ---@return boolean
-function Model:setTable(id)
-  return self._:setTable(id)
+function Model:switchTable(table_id)
+  return self.tbl:setTable(table_id)
+end
+
+---@return Parameters
+function Model:getParameter()
+  return self.all_table[self.now_table_id]
+end
+
+---@return FSRS
+function Model:getFsrs()
+  return _FSRS_.fsrs:new(self:getParameter())
 end
 
 function Model:clear()
-  return self._:clear()
+  return self.tbl:clear()
+end
+
+---@param sql_card FsrsTableField
+---@return Card
+function Model:convertRealCard(sql_card)
+  local data = tools.parse(sql_card.info)
+  --print(vim.inspect(data))
+  return _.Card:new(data)
+end
+
+---@param id number
+---@param rating RatingType
+---@param now_time? Timestamp
+function Model:ratingCard(id, rating, now_time)
+  local fsrs = self:getFsrs()
+  local sql_card = self:findById(id)
+  now_time = now_time or os.time()
+  local new_card = fsrs:repeats(self:convertRealCard(sql_card), now_time)[rating].card
+  sql_card.due = new_card.due
+  sql_card.info = new_card:dumpStr()
+  self:editCard(id, sql_card)
 end
 
 return Model:getInstance()

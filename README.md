@@ -69,6 +69,10 @@ Views (WinBuf, Telescope, Hydra)
 function setup()
 end
 
+--- 获取所有的卡组
+function get_tables()
+end
+
 --- 切换卡组
 function switch_table()
 end

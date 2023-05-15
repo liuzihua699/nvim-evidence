@@ -11,16 +11,16 @@ local SqlInfo = {}
 ---@class FsrsTableField
 ---@field id number
 ---@field content string
----@field schedule number
+---@field due Timestamp
 ---@field info string fsrs data
 local FsrsTableField = {
   id = 0, -- same as { type = "integer", required = true, primary = true }
   content = "text",
-  schedule = now_time,
+  due = now_time,
   info = "",
 }
 
----@class SqlTableImpl
+---@class SqlTable
 ---@field sqlite any
 ---@field tbl any
 ---@field uri string sql path
@@ -29,10 +29,10 @@ local FsrsTableField = {
 ---@field now_table any
 ---@field all_table table<string,any>
 ---@field table_field table<string,any>
-local SqlTableImpl = {}
-SqlTableImpl.__index = SqlTableImpl
+local SqlTable = {}
+SqlTable.__index = SqlTable
 
-function SqlTableImpl:new()
+function SqlTable:new()
   self.sqlite = require("sqlite.db")
   self.tbl = require("sqlite.tbl")
   self.uri = ""
@@ -42,15 +42,23 @@ function SqlTableImpl:new()
   self.table_field = {
     id = true, -- same as { type = "integer", required = true, primary = true }
     content = { "text" },
-    schedule = { "number", default = FsrsTableField.schedule },
+    due = { "number", default = FsrsTableField.due },
     info = { "text", required = true },
   }
   self.all_table = {}
   return setmetatable({}, self)
 end
 
+function SqlTable:dump()
+  return {
+    uri = self.uri,
+    all_table_id = self.all_table_id,
+    now_table_id = self.now_table_id,
+  }
+end
+
 ---@param data SqlInfo
-function SqlTableImpl:setup(data)
+function SqlTable:setup(data)
   assert(data.uri ~= nil, "uri required")
   assert(type(data.all_table_id) == "table", "all_table_id required table")
   assert(type(data.now_table_id) == "string", "now_table_id required string")
@@ -69,15 +77,18 @@ function SqlTableImpl:setup(data)
   self.sqlite(tools.merge(uri_map, self.all_table))
 end
 
----@param obj table<string,any>
-function SqlTableImpl:insert(obj)
-  self.now_table:insert(obj)
+---@param content string
+---@param info string
+---@param due Timestamp
+function SqlTable:insertCard(content, info, due)
+  self.now_table:insert({ content = content, info = info, due = due })
 end
 
 ---@param id number
----@param row table
+---@param row FsrsTableField
 ---@return boolean
-function SqlTableImpl:editById(id, row)
+function SqlTable:editById(id, row)
+  row["id"] = nil
   return self.now_table:update({
     where = { id = id },
     set = row,
@@ -86,7 +97,7 @@ end
 
 ---@param query string
 ---@return nil | table
-function SqlTableImpl:eval(query)
+function SqlTable:eval(query)
   local item = self.now_table:eval(query)
   if tools.isTableEmpty(item) then
     return nil
@@ -94,14 +105,14 @@ function SqlTableImpl:eval(query)
   return item
 end
 
-function SqlTableImpl:clear()
+function SqlTable:clear()
   return self:eval("delete from " .. self.now_table_id)
 end
 
 ---@param limit_num number
 ---@param statement string | nil
 ---@return nil | FsrsTableField[]
-function SqlTableImpl:find(limit_num, statement)
+function SqlTable:find(limit_num, statement)
   local query = "SELECT * FROM " .. self.now_table_id
   if statement ~= nil then
     query = query .. " where " .. statement
@@ -117,14 +128,14 @@ function SqlTableImpl:find(limit_num, statement)
 end
 
 ---@param id number
-function SqlTableImpl:del(id)
+function SqlTable:del(id)
   self.now_table:remove({ id = id })
 end
 
 ---@param column number
 ---@param statement string | nil
 ---@return nil | FsrsTableField
-function SqlTableImpl:min(column, statement)
+function SqlTable:min(column, statement)
   local query = "SELECT *, MIN(" .. column .. ") AS `rowmin` FROM " .. self.now_table_id
   if statement ~= nil then
     query = query .. " where " .. statement
@@ -137,15 +148,15 @@ function SqlTableImpl:min(column, statement)
   end
 end
 
----@param id string
+---@param table_id string
 ---@return boolean
-function SqlTableImpl:setTable(id)
-  if tools.isInTable(id, self.all_table_id) then
-    self.now_table_id = id
-    self.now_table = self.all_table[id]
+function SqlTable:setTable(table_id)
+  if tools.isInTable(table_id, self.all_table_id) then
+    self.now_table_id = table_id
+    self.now_table = self.all_table[table_id]
     return true
   end
   return false
 end
 
-return SqlTableImpl
+return SqlTable

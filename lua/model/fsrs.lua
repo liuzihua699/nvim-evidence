@@ -139,6 +139,6 @@ function FSRS:repeats(card_, now)
 end
 
 return {
-	FSRS = FSRS,
-	MODEL = _,
+	fsrs = FSRS,
+	model = _,
 }

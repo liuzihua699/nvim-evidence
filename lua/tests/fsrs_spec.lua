@@ -1,6 +1,6 @@
-local fsrs = require("lua.fsrs")
-local tools = require("lua.tools")
-local _ = fsrs.MODEL
+local FSRS = require("lua.model.fsrs")
+local tools = require("lua.util.tools")
+local _ = FSRS.model
 
 local eq = function(a, b)
 	assert.are.same(a, b)
@@ -10,13 +10,13 @@ end
 local printFSRS = function(data)
 	print("<<<<<<<")
 	print("again.card:")
-	data[_.Rating.Again].card:dump()
+	tools.printDump(data[_.Rating.Again].card:dump())
 	print("hard.card:")
-	data[_.Rating.Hard].card:dump()
+	tools.printDump(data[_.Rating.Hard].card:dump())
 	print("good.card:")
-	data[_.Rating.Good].card:dump()
+	tools.printDump(data[_.Rating.Good].card:dump())
 	print("easy.card:")
-	data[_.Rating.Easy].card:dump()
+	tools.printDump(data[_.Rating.Easy].card:dump())
 	print(">>>>>>>")
 end
 
@@ -33,7 +33,7 @@ describe("fsrs", function()
 	--	tools.dump(cards)
 	--end)
 	it("fsrs_schedule", function()
-		local f = fsrs.FSRS:new()
+		local f = FSRS.fsrs:new()
 		local card = _.Card:new()
 
 		local now = os.time({ year = 2022, month = 11, day = 29, hour = 12, min = 30, sec = 0 })
