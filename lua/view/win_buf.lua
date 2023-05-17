@@ -1,4 +1,4 @@
-local tools = require("lua.tools")
+local tools = require("lua.util.tools")
 
 ---@class WinBufImpl
 ---@field win number

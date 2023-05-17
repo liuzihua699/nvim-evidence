@@ -141,3 +141,11 @@ end
 function open_split_win()
 end
 ```
+
+## other tip
+
+lru telescope 窗口
+
+支持tele搜索内容放到多个buffer，但now只有一个，且支持弹出now
+
+所有牌组随机抽
