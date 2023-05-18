@@ -1,13 +1,13 @@
-local model = require("lua.model.index")
-local _ = require("lua.model.fsrs_models")
-local tools = require("lua.util.tools")
+local model = require("evidence.model.index")
+local _ = require("evidence.model.fsrs_models")
+local tools = require("evidence.util.tools")
 
 local eq = function(a, b)
   assert.are.same(a, b)
 end
 
 local data = {
-  uri = "/Users/junyiouyang/.local/share/nvim/lazy/nvim-evidence/sql/v2",
+  uri = "/Users/junyiouyang/.config/nvim/sql/v2",
   all_table = {
     t1 = {},
     t2 = {

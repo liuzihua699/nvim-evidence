@@ -132,8 +132,8 @@ function SqlTable:del(id)
   self.now_table:remove({ id = id })
 end
 
----@param column number
----@param statement string | nil
+---@param column string
+---@param statement? string
 ---@return nil | FsrsTableField
 function SqlTable:min(column, statement)
   local query = "SELECT *, MIN(" .. column .. ") AS `rowmin` FROM " .. self.now_table_id
