@@ -130,7 +130,7 @@ function Model:delCard(id)
 	return true
 end
 
----@param column number
+---@param column string
 ---@param statement string | nil
 ---@return nil | FsrsTableField
 function Model:min(column, statement)

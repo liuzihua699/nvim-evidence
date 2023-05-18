@@ -5,6 +5,7 @@ local win_buf = require("evidence.view.win_buf")
 
 local user_data = nil
 local is_start_ = false
+local now_item = nil
 
 local function hint_list(name, list)
 	local res = [[
@@ -59,7 +60,7 @@ local function WrapListHeads(list, func)
 end
 
 local evidence_hint = [[
- _x_: start
+ _x_: start _s_: score
  ^
      _<Esc>_: exit  _q_: exit
 ]]
@@ -73,15 +74,35 @@ local function setup()
 	win_buf:setup({})
 end
 
-local function start()
-	setup()
-	win_buf:openSplitWin()
+local function next()
 	local item = model:get_min_due_item()
 	if item == nil then
 		print("empty table")
 		return
 	end
-  win_buf:viewContent(item.content)
+	now_item = item
+	win_buf:viewContent(item.content)
+end
+
+local function start()
+	setup()
+	win_buf:openSplitWin()
+  next()
+end
+
+local function checkScore(score)
+	return score == 0 or score == 1 or score == 2 or score == 3
+end
+
+local function score()
+	local rating = tonumber(tools.uiInput("score(0,1,2,3):", ""))
+	if type(rating) ~= "number" or not checkScore(rating) then
+		print("input format error (0,1,2,3)")
+		return
+	end
+	print(rating)
+	model:ratingCard(now_item.id, rating)
+  next()
 end
 
 ---@param data ModelTableInfo
@@ -102,10 +123,8 @@ local setup = function(data)
 		mode = "n",
 		body = "<Leader>O",
 		heads = {
-			{
-				"x",
-				start,
-			},
+			{ "x", start },
+			{ "s", score },
 			{ "q", nil, { exit = true, nowait = true, desc = "exit" } },
 			{ "<Esc>", nil, { exit = true, nowait = true } },
 		},
