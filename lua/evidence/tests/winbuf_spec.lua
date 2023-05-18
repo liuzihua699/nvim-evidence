@@ -1,4 +1,4 @@
-local WinBuf = require("lua.view.win_buf")
+local WinBuf = require("evidence.view.win_buf")
 WinBuf:setup({})
 
 local eq = function(a, b)

@@ -1,7 +1,7 @@
-local SqlTable = require("lua.model.table")
-local _FSRS_ = require("lua.model.fsrs")
+local SqlTable = require("evidence.model.table")
+local _FSRS_ = require("evidence.model.fsrs")
 local _ = _FSRS_.model
-local tools = require("lua.util.tools")
+local tools = require("evidence.util.tools")
 
 ---@class ModelTableInfo
 ---@field uri string

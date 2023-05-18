@@ -1,6 +1,6 @@
-local tools = require("utils.util.tools")
+local tools = require("evidence.util.tools")
 local Hydra = require("hydra")
-local model = require("lua.model.index")
+local model = require("evidence.model.index")
 
 local function hint_list(name, list)
   local res = [[

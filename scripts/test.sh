@@ -14,7 +14,7 @@ echo_help() {
 	exit 1
 }
 
-default_path=${root_dir}/lua/tests/
+default_path=${root_dir}/lua/evidence/tests/
 
 min_vim="${root_dir}/scripts/minimal_init.vim"
 

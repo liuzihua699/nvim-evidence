@@ -1,5 +1,5 @@
-local FSRS = require("lua.model.fsrs")
-local tools = require("lua.util.tools")
+local FSRS = require("evidence.model.fsrs")
+local tools = require("evidence.util.tools")
 local _ = FSRS.model
 
 local eq = function(a, b)

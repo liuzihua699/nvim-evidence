@@ -1,4 +1,4 @@
-local tools = require("lua.util.tools")
+local tools = require("evidence.util.tools")
 
 --- @alias RatingType integer
 --- @class Rating

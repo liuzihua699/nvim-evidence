@@ -1,4 +1,4 @@
-local hydra = require("lua.view.hydra")
+local hydra = require("evidence.view.hydra")
 
 local command_list = {
   setup = hydra.setup,
