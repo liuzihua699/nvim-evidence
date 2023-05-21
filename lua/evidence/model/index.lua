@@ -64,6 +64,11 @@ function Model:setup(data)
   self.tbl:setup(sql_info)
 end
 
+---@return table<string>
+function Model:getTableIds()
+  return self.tbl:getTableIds()
+end
+
 ---@return ModelTableInfo
 function Model:getAllInfo()
   return {

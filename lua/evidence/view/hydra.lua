@@ -60,9 +60,9 @@ local function WrapListHeads(list, func)
 end
 
 local evidence_hint = [[
- _x_: start _s_: score
+ _x_: start _s_: score _t_: switchTable
  _f_: fuzzyFind _m_: minFind
- _e_: edit _d_: delete
+ _e_: edit _d_: delete _a_: add
  ^
      _<Esc>_: exit  _q_: exit
 ]]
@@ -74,6 +74,7 @@ local function setup()
   is_start_ = true
   model:setup(user_data)
   win_buf:setup({})
+  win_buf:openSplitWin()
 end
 
 local function next()
@@ -87,7 +88,6 @@ end
 
 local function start()
   setup()
-  win_buf:openSplitWin()
   next()
 end
 
@@ -115,12 +115,12 @@ local function score()
 end
 
 local function fuzzyFind()
-  start()
+  setup()
   telescope.find(telescope.SearchMode.fuzzy)
 end
 
 local function minFind()
-  start()
+  setup()
   telescope.find(telescope.SearchMode.min_due)
 end
 
@@ -139,6 +139,26 @@ local function delete()
   end
   model:delCard(getNowItem().id)
   next()
+end
+
+local function switchTable()
+  setup()
+  local tables = model:getTableIds()
+  local drillHeads = WrapListHeads(tables, function(id)
+    model:switchTable(tables[id])
+  end)
+  local drill_hint = hint_list("drill table", tables)
+  local drill_table_hydra = WrapHydra("drill_table_hydra", drill_hint, drillHeads)
+  Hydra.activate(drill_table_hydra)
+end
+
+local function add()
+  if is_start_ == false then
+    return
+  end
+  local content = vim.api.nvim_buf_get_lines(win_buf:getInfo().buf, 0, -1, false)
+  local content_str = table.concat(content, "\n")
+  model:addNewCard(content_str)
 end
 
 ---@param data ModelTableInfo
@@ -160,13 +180,15 @@ local setup = function(data)
     body = "<Leader>O",
     heads = {
       { "x",     start },
+      { "a",     add },
       { "s",     score },
       { "f",     fuzzyFind },
       { "m",     minFind },
       { "e",     edit },
       { "d",     delete },
-      { "q",     nil,      { exit = true, nowait = true, desc = "exit" } },
-      { "<Esc>", nil,      { exit = true, nowait = true } },
+      { "t",     switchTable, { exit = true, nowait = true, desc = "exit" } },
+      { "q",     nil,         { exit = true, nowait = true, desc = "exit" } },
+      { "<Esc>", nil,         { exit = true, nowait = true } },
     },
   })
 end

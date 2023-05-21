@@ -77,6 +77,11 @@ function SqlTable:setup(data)
   self.sqlite(tools.merge(uri_map, self.all_table))
 end
 
+---@return table<string>
+function SqlTable:getTableIds()
+  return self.all_table_id
+end
+
 ---@param content string
 ---@param info string
 ---@param due Timestamp
