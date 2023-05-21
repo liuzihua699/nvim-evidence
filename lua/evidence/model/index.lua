@@ -8,6 +8,7 @@ local tools = require("evidence.util.tools")
 ---@field content string
 ---@field due Timestamp
 ---@field card Card
+---@field file_type string "markdown" | "org"
 --
 ---@class ModelTableInfo
 ---@field uri string
@@ -88,7 +89,12 @@ end
 ---@param content string
 function Model:addNewCard(content)
   local card_info = _.Card:new()
-  self.tbl:insertCard(content, card_info:dumpStr(), card_info.due)
+  local file_type = vim.bo.filetype
+  if not file_type or file_type == "" then
+    file_type = "markdown"
+  end
+
+  self.tbl:insertCard(content, card_info:dumpStr(), card_info.due, file_type)
 end
 
 ---@param id number
@@ -115,6 +121,7 @@ function Model:getMinDueItem(limit_num)
         id = v.id,
         content = v.content,
         due = v.due,
+        file_type = v.file_type,
         card = self:convertRealCard(v),
       })
     end

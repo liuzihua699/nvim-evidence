@@ -42,6 +42,7 @@ fsrs pluginfor nvim
              "nvim-telescope/telescope.nvim"
          }
 }
+```
 
 ### Hydra + Telescope
 
@@ -96,5 +97,3 @@ Views (WinBuf, Telescope, Hydra)
 - 撤销
 
 - 脚本实现 anki 迁移
-
-- card support type

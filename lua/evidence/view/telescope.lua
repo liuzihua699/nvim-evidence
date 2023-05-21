@@ -11,7 +11,7 @@ local ns_previewer = vim.api.nvim_create_namespace("telescope.previewers")
 local status1, telescope = pcall(require, "telescope")
 local defer = require("evidence.util.throttle-debounce")
 local tools = require("evidence.util.tools")
-local index = require("evidence.model.index")
+local model = require("evidence.model.index")
 local win_buf = require("evidence.view.win_buf")
 
 vim.api.nvim_command("highlight EvidenceWord guibg=red")
@@ -40,9 +40,9 @@ local now_search_mode = SearchMode.fuzzy
 local process_work = function(prompt, process_result, process_complete)
   local x = nil
   if now_search_mode == SearchMode.fuzzy then
-    x = index:fuzzyFind(prompt, 50)
+    x = model:fuzzyFind(prompt, 50)
   elseif now_search_mode == SearchMode.min_due then
-    x = index:getMinDueItem(50)
+    x = model:getMinDueItem(50)
   end
   if type(x) ~= "table" then
     s_prompt = ""
@@ -110,7 +110,11 @@ local function live_fd(opts)
             end
             local formTbl = tools.str2table(entry.display)
             vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, formTbl)
-            putils.highlighter(self.state.bufnr, "org")
+            local file_type = entry.value.file_type
+            if not file_type or file_type == "" then
+              file_type = "markdown"
+            end
+            putils.highlighter(self.state.bufnr, file_type)
             vim.schedule(function()
               vim.api.nvim_buf_call(self.state.bufnr, function()
                 clear_match()

@@ -145,7 +145,11 @@ local function edit()
   end
   local content = vim.api.nvim_buf_get_lines(win_buf:getInfo().buf, 0, -1, false)
   local content_str = table.concat(content, "\n")
-  model:editCard(getNowItem().id, { content = content_str })
+  local file_type = vim.bo.filetype
+  if not file_type or file_type == "" then
+    file_type = "markdown"
+  end
+  model:editCard(getNowItem().id, { content = content_str, file_type = file_type })
 end
 
 local function delete()
@@ -169,7 +173,6 @@ local function switchTable()
   local drill_table_hydra = WrapHydra("drill_table_hydra", drill_hint, drillHeads)
   Hydra.activate(drill_table_hydra)
 end
-
 
 local function add()
   if is_start_ == false then

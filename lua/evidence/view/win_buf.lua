@@ -3,12 +3,14 @@ local tools = require("evidence.util.tools")
 ---@class WinBufImpl
 ---@field win number
 ---@field buf number
+---@field item CardItem | {}
 local WinBufImpl = {}
 WinBufImpl.__index = WinBufImpl
 
 function WinBufImpl:new()
   self.win = -1
   self.buf = -1
+  self.item = {}
   return setmetatable({}, self)
 end
 
@@ -95,7 +97,10 @@ function WinBufImpl:viewContent(form)
   local formTbl = tools.str2table(form)
   vim.api.nvim_buf_set_lines(self.buf, 0, -1, false, formTbl)
   vim.api.nvim_buf_set_option(self.buf, "modifiable", true)
-  vim.api.nvim_buf_set_option(self.buf, "filetype", "org")
+  if not self.item.filetype or self.item.filetype == "" then
+    self.item.filetype = "markdown"
+  end
+  vim.api.nvim_buf_set_option(self.buf, "filetype", self.item.filetype)
   vim.wo.number = true
   vim.wo.relativenumber = true
   vim.o.cursorcolumn = true
@@ -120,7 +125,6 @@ end
 ---@field _ WinBufImpl
 ---@field is_setup boolean
 ---@field instance WinBuf
----@field item CardItem | {}
 local WinBuf = {}
 
 WinBuf.__index = function(self, key)
@@ -141,7 +145,7 @@ end
 function WinBuf:getInstance()
   if not self.instance then
     self._ = WinBufImpl:new()
-    self.instance = setmetatable({ is_setup = false, item = {} }, self)
+    self.instance = setmetatable({ is_setup = false }, self)
   end
   return self.instance
 end
@@ -166,7 +170,7 @@ function WinBuf:getInfo()
   return {
     win = self._.win,
     buf = self._.buf,
-    item = self.item,
+    item = self._.item,
   }
 end
 
@@ -176,7 +180,7 @@ end
 
 ---@param item CardItem
 function WinBuf:viewContent(item)
-  self.item = item
+  self._.item = item
   self._:viewContent(item.content)
 end
 

@@ -13,11 +13,13 @@ local SqlInfo = {}
 ---@field content string
 ---@field due Timestamp
 ---@field info string fsrs data
+---@field file_type string "markdown" | "org"
 local FsrsTableField = {
   id = 0, -- same as { type = "integer", required = true, primary = true }
   content = "text",
   due = now_time,
   info = "",
+  file_type = "markdown",
 }
 
 ---@class SqlTable
@@ -42,8 +44,9 @@ function SqlTable:new()
   self.table_field = {
     id = true, -- same as { type = "integer", required = true, primary = true }
     content = { "text" },
-    due = { "number", default = FsrsTableField.due },
+    due = { "number" },
     info = { "text", required = true },
+    file_type = { "text" },
   }
   self.all_table = {}
   return setmetatable({}, self)
@@ -85,8 +88,12 @@ end
 ---@param content string
 ---@param info string
 ---@param due Timestamp
-function SqlTable:insertCard(content, info, due)
-  self.now_table:insert({ content = content, info = info, due = due })
+---@param file_type? string
+function SqlTable:insertCard(content, info, due, file_type)
+  if not file_type or file_type == "" then
+    file_type = "markdown"
+  end
+  self.now_table:insert({ content = content, info = info, due = due, file_type = file_type })
 end
 
 ---@param id number
