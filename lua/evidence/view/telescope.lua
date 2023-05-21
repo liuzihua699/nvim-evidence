@@ -9,10 +9,10 @@ local entry_display = require("telescope.pickers.entry_display")
 local action_state = require("telescope.actions.state")
 local ns_previewer = vim.api.nvim_create_namespace("telescope.previewers")
 local status1, telescope = pcall(require, "telescope")
-local org_sql = require("evidence.table")
-local defer = require("utils.throttle-debounce")
-local tools = require("utils.tools")
-local index = require("evidence.index")
+local defer = require("evidence.util.throttle-debounce")
+local tools = require("evidence.util.tools")
+local index = require("evidence.model.index")
+local win_buf = require("evidence.view.win_buf")
 
 vim.api.nvim_command("highlight EvidenceWord guibg=red")
 
@@ -25,12 +25,11 @@ local entry_maker = function(entry)
   }
 end
 
-local function sql_find(prompt)
-  return org_sql.find(50, "content like '%" .. prompt .. "%'")
-end
+local fn, timer
+local s_prompt = ""
 
 local process_work = function(prompt, process_result, process_complete)
-  local x = sql_find(prompt)
+  local x = index:fuzzyFind(prompt, 50)
   if type(x) ~= "table" then
     s_prompt = ""
     process_complete()
@@ -41,9 +40,6 @@ local process_work = function(prompt, process_result, process_complete)
   end
   process_complete()
 end
-
-local fn, timer
-local s_prompt = ""
 
 local async_job = setmetatable({
   close = function()
@@ -84,42 +80,42 @@ end
 
 local function live_fd(opts)
   pickers
-    .new(opts, {
-      prompt_title = "evidence",
-      finder = async_job,
-      sorter = conf.generic_sorter(opts), -- shouldn't this be default?
-      previewer = previewers.new_buffer_previewer({
-        keep_last_buf = true,
-        get_buffer_by_name = function(_, entry)
-          return entry.value.id
-        end,
-        define_preview = function(self, entry, status)
-          --print(vim.inspect(entry))
-          if s_prompt == "" then
-            return
-          end
-          local formTbl = tools.str2table(entry.display)
-          vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, formTbl)
-          putils.highlighter(self.state.bufnr, "org")
-          vim.schedule(function()
-            vim.api.nvim_buf_call(self.state.bufnr, function()
-              clear_match()
-              vim.api.nvim_command("call matchadd('EvidenceWord','" .. s_prompt .. "')")
+      .new(opts, {
+        prompt_title = "evidence",
+        finder = async_job,
+        sorter = conf.generic_sorter(opts), -- shouldn't this be default?
+        previewer = previewers.new_buffer_previewer({
+          keep_last_buf = true,
+          get_buffer_by_name = function(_, entry)
+            return entry.value.id
+          end,
+          define_preview = function(self, entry, status)
+            --print(vim.inspect(entry))
+            if s_prompt == "" then
+              return
+            end
+            local formTbl = tools.str2table(entry.display)
+            vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, formTbl)
+            putils.highlighter(self.state.bufnr, "org")
+            vim.schedule(function()
+              vim.api.nvim_buf_call(self.state.bufnr, function()
+                clear_match()
+                vim.api.nvim_command("call matchadd('EvidenceWord','" .. s_prompt .. "')")
+              end)
             end)
+          end,
+        }),
+        attach_mappings = function(prompt_bufnr, map)
+          actions.select_default:replace(function()
+            actions.close(prompt_bufnr)
+            local selection = action_state.get_selected_entry()
+            --print(vim.inspect(selection))
+            win_buf:viewContent(selection.value.content)
           end)
+          return true
         end,
-      }),
-      attach_mappings = function(prompt_bufnr, map)
-        actions.select_default:replace(function()
-          actions.close(prompt_bufnr)
-          local selection = action_state.get_selected_entry()
-          --print(vim.inspect(selection))
-          index.content_overlay(selection.value)
-        end)
-        return true
-      end,
-    })
-    :find()
+      })
+      :find()
 end
 
 local function find()

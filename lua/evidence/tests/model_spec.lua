@@ -7,7 +7,7 @@ local eq = function(a, b)
 end
 
 local data = {
-	uri = "/Users/junyiouyang/.config/nvim/sql/v2",
+	uri = "/Users/ouyangjunyi/.config/nvim/sql/v2",
 	all_table = {
 		t1 = {},
 		t2 = {
@@ -88,6 +88,6 @@ describe("fsrs_sql_model", function()
 		tools.printDump(data)
 	end)
 	it("reset", function()
-		reset()
+		reset(100)
 	end)
 end)
