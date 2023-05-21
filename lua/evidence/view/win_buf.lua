@@ -105,9 +105,10 @@ function WinBufImpl:viewContent(form)
   vim.wo.relativenumber = true
   vim.o.cursorcolumn = true
   vim.wo.cursorline = true
-  vim.api.nvim_feedkeys("gg", "n", false)
+  --vim.api.nvim_feedkeys("gg", "n", false)
+  vim.wo.foldmethod = "expr"
   vim.wo.foldlevel = 1
-  vim.api.nvim_feedkeys("za", "n", false)
+  --vim.api.nvim_feedkeys("za", "n", false)
   --vim.api.nvim_feedkeys("zx", "n", false)
 end
 

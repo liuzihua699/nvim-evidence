@@ -7,7 +7,7 @@ local eq = function(a, b)
 end
 
 local data = {
-  uri = "/Users/ouyangjunyi/.config/nvim/sql/v2",
+  uri = "~/.config/nvim/sql/v2",
   all_table = {
     t1 = {},
     t2 = {
