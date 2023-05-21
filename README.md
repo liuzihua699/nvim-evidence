@@ -1,12 +1,8 @@
 # NVIM-EVIDENCE
 
-## Status
+## Purpose
 
-The project is under development
-
-## Aim
-
-Knowledge Memory Warehouse
+fsrs pluginfor nvim
 
 ## Reference
 
@@ -14,7 +10,34 @@ Knowledge Memory Warehouse
 
 ## Usage Scene
 
-### Hydra
+### Setup
+
+```lua
+local user_data = {
+	uri = "~/.config/nvim/sql/v1",
+	all_table = {
+		table_name1 = {
+			request_retention = 0.7,
+			maximum_interval = 100,
+			easy_bonus = 1.0,
+			hard_factor = 0.8,
+			w = { 1.0, 1.0, 5.0, -0.5, -0.5, 0.2, 1.4, -0.12, 0.8, 2.0, -0.2, 0.2, 1.0 },
+        },
+		table_name2 = {
+            request_retention = 0.9,
+            maximum_interval = 36500,
+            easy_bonus = 1.3,
+            hard_factor = 1.2,
+            w = { 1.0, 1.0, 5.0, -0.5, -0.5, 0.2, 1.4, -0.12, 0.8, 2.0, -0.2, 0.2, 1.0 },
+		},
+	},
+	now_table_id = "table_name1",
+}
+local evidence = require("evidence")
+evidence.setup(user_data)
+```
+
+### Hydra + Telescope
 
 - a: add
 
@@ -22,7 +45,7 @@ Knowledge Memory Warehouse
 
 - x: start
 
-初始化FSRS
+初始化 FSRS
 
 - d: del
 
@@ -30,7 +53,7 @@ Knowledge Memory Warehouse
 
 - s: switchTable
 
-切换table 
+切换 table
 
 - e: edit
 
@@ -40,116 +63,30 @@ Knowledge Memory Warehouse
 
 打印当前缓冲区卡片和对应表的详细信息
 
-- q: quality
+- s: score
 
-给当前卡片打分, 二次输入
+给当前卡片打分
 
-- f: telescope
+- f: fuzzyFind
 
-开启搜索
+开启根据卡片内容的模糊搜索
 
-### Telescope
+- m: minFind
 
-- 移动 ctrl+j/k
+开启根据最近需要复习卡片的搜索
 
-- 输入框模糊搜索卡片内容
-
-- 将选中卡片内容设置在缓冲区中 enter
-
-## Module Design
+## Module
 
 Models (FSRS, SqlTable)
 Controller
 Views (WinBuf, Telescope, Hydra)
 
-## User Interface
+## Todo
 
-```lua
---- 初始化开始
-function setup()
-end
+- 支持多 winbuf
 
---- 获取所有的卡组
-function get_tables()
-end
+- 所有牌组随机抽
 
---- 切换卡组
-function switch_table()
-end
+- 撤销
 
----修改当前卡片
-function add_card()
-end
-
----修改当前卡片
-function edit_now_card()
-end
-
----删除当前卡片
-function del_now_card()
-end
-
----删除一些卡片
-function del_card()
-end
-
----给当前卡片打分
-function score_now_card()
-end
-
---- 跳转到下一个卡片
-function switch_next_card()
-judge_next()
-end
-
---- 根据内容来查找匹配的卡片
-function get_cards_by_content()
-end
-
---- 打印当前卡片详细信息
-function print_now_card_info()
-end
-```
-
-## Private Interface
-
-```lua
----将指定卡片作为当前buffer的卡片, 重置卡片上下文
-function reset_now_card(card)
-end
-
-
---- 返回下一个卡片(策略)
-function judge_next_card()
-  return get_min_due_card()
-end
-
---- 获取最先到期的卡片
----@return Card
-function get_min_due_card()
-end
-
---- 获取随机卡片 P3
-function get_rand_card()
-end
-
---- 获取新卡片 P3
-function get_new_card()
-end
-
---- 打开侧边buffer
-function open_split_win()
-end
-```
-
-## other tip
-
-lru telescope 窗口
-
-支持tele搜索内容放到多个buffer，但now只有一个，且支持弹出now
-
-所有牌组随机抽
-
-添加confirm提示
-
-撤销
+- 脚本实现 anki 迁移
