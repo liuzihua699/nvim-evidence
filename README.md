@@ -2,7 +2,7 @@
 
 ## Purpose
 
-fsrs pluginfor nvim
+fsrs plugin for nvim
 
 ## Reference
 
@@ -32,7 +32,6 @@ fsrs pluginfor nvim
                      table_name2 = {},
                  },
                  now_table_id = "table_name1",
-                 file_type = "markdown",
              }
              require("evidence").setup(user_data)
          end,
@@ -95,5 +94,3 @@ Views (WinBuf, Telescope, Hydra)
 - 所有牌组随机抽
 
 - 撤销
-
-- 脚本实现 anki 迁移
