@@ -151,3 +151,5 @@ lru telescope 窗口
 所有牌组随机抽
 
 添加confirm提示
+
+撤销

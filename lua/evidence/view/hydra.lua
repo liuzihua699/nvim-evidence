@@ -4,6 +4,7 @@ local model = require("evidence.model.index")
 local win_buf = require("evidence.view.win_buf")
 local telescope = require("evidence.view.telescope")
 
+---@type ModelTableInfo
 local user_data = nil
 local is_start_ = false
 
@@ -67,6 +68,17 @@ local evidence_hint = [[
      _<Esc>_: exit  _q_: exit
 ]]
 
+---@param foo_name string
+---@return boolean
+local function confirmCheck(foo_name)
+  local confirm = tools.uiInput(foo_name .. " to table_id:" .. user_data.now_table_id .. "  (y/n):", "")
+  if confirm ~= "y" then
+    print(foo_name .. " failed")
+    return false
+  end
+  return true
+end
+
 local function setup()
   if is_start_ == true then
     return
@@ -128,6 +140,9 @@ local function edit()
   if is_start_ == false then
     return
   end
+  if not confirmCheck("editCard") then
+    return
+  end
   local content = vim.api.nvim_buf_get_lines(win_buf:getInfo().buf, 0, -1, false)
   local content_str = table.concat(content, "\n")
   model:editCard(getNowItem().id, { content = content_str })
@@ -135,6 +150,9 @@ end
 
 local function delete()
   if is_start_ == false then
+    return
+  end
+  if not confirmCheck("delCard") then
     return
   end
   model:delCard(getNowItem().id)
@@ -152,8 +170,12 @@ local function switchTable()
   Hydra.activate(drill_table_hydra)
 end
 
+
 local function add()
   if is_start_ == false then
+    return
+  end
+  if not confirmCheck("addCard") then
     return
   end
   local content = vim.api.nvim_buf_get_lines(win_buf:getInfo().buf, 0, -1, false)
