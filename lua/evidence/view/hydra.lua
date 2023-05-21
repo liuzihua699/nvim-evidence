@@ -6,7 +6,6 @@ local telescope = require("evidence.view.telescope")
 
 local user_data = nil
 local is_start_ = false
-local now_item = nil
 
 local function hint_list(name, list)
   local res = [[
@@ -61,8 +60,9 @@ local function WrapListHeads(list, func)
 end
 
 local evidence_hint = [[
- _x_: start _s_: score 
+ _x_: start _s_: score
  _f_: fuzzyFind _m_: minFind
+ _e_: edit _d_: delete
  ^
      _<Esc>_: exit  _q_: exit
 ]]
@@ -82,8 +82,7 @@ local function next()
     print("empty table")
     return
   end
-  now_item = item[1]
-  win_buf:viewContent(now_item.content)
+  win_buf:viewContent(item[1])
 end
 
 local function start()
@@ -96,23 +95,50 @@ local function checkScore(score)
   return score == 0 or score == 1 or score == 2 or score == 3
 end
 
+---@return CardItem
+local function getNowItem()
+  return win_buf:getInfo().item
+end
+
 local function score()
+  if is_start_ == false then
+    return
+  end
   local rating = tonumber(tools.uiInput("score(0,1,2,3):", ""))
   if type(rating) ~= "number" or not checkScore(rating) then
     print("input format error (0,1,2,3)")
     return
   end
   print(rating)
-  model:ratingCard(now_item.id, rating)
+  model:ratingCard(getNowItem().id, rating)
   next()
 end
 
 local function fuzzyFind()
+  start()
   telescope.find(telescope.SearchMode.fuzzy)
 end
 
 local function minFind()
+  start()
   telescope.find(telescope.SearchMode.min_due)
+end
+
+local function edit()
+  if is_start_ == false then
+    return
+  end
+  local content = vim.api.nvim_buf_get_lines(win_buf:getInfo().buf, 0, -1, false)
+  local content_str = table.concat(content, "\n")
+  model:editCard(getNowItem().id, { content = content_str })
+end
+
+local function delete()
+  if is_start_ == false then
+    return
+  end
+  model:delCard(getNowItem().id)
+  next()
 end
 
 ---@param data ModelTableInfo
@@ -137,8 +163,10 @@ local setup = function(data)
       { "s",     score },
       { "f",     fuzzyFind },
       { "m",     minFind },
-      { "q",     nil,  { exit = true, nowait = true, desc = "exit" } },
-      { "<Esc>", nil,  { exit = true, nowait = true } },
+      { "e",     edit },
+      { "d",     delete },
+      { "q",     nil,      { exit = true, nowait = true, desc = "exit" } },
+      { "<Esc>", nil,      { exit = true, nowait = true } },
     },
   })
 end

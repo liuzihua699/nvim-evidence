@@ -124,7 +124,7 @@ local function live_fd(opts)
             actions.close(prompt_bufnr)
             local selection = action_state.get_selected_entry()
             --print(vim.inspect(selection))
-            win_buf:viewContent(selection.value.content)
+            win_buf:viewContent(selection.value)
           end)
           return true
         end,

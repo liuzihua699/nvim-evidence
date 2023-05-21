@@ -120,11 +120,7 @@ end
 ---@field _ WinBufImpl
 ---@field is_setup boolean
 ---@field instance WinBuf
----@field setup function
----@field getInfo function
----@field openFloatWin function
----@field openSplitWin function
----@field viewContent function
+---@field item CardItem | {}
 local WinBuf = {}
 
 WinBuf.__index = function(self, key)
@@ -145,7 +141,7 @@ end
 function WinBuf:getInstance()
   if not self.instance then
     self._ = WinBufImpl:new()
-    self.instance = setmetatable({ is_setup = false }, self)
+    self.instance = setmetatable({ is_setup = false, item = {} }, self)
   end
   return self.instance
 end
@@ -160,11 +156,17 @@ function WinBuf:setup(data)
   self._:setup(data)
 end
 
----@return table<string,number>
+---@class WinBufInfo
+---@field win number
+---@field buf number
+---@field item CardItem
+
+---@return WinBufInfo
 function WinBuf:getInfo()
   return {
     win = self._.win,
     buf = self._.buf,
+    item = self.item,
   }
 end
 
@@ -172,8 +174,10 @@ function WinBuf:openFloatWin()
   self._:openFloatWin()
 end
 
-function WinBuf:viewContent(form)
-  self._:viewContent(form)
+---@param item CardItem
+function WinBuf:viewContent(item)
+  self.item = item
+  self._:viewContent(item.content)
 end
 
 function WinBuf:openSplitWin()

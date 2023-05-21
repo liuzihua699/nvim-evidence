@@ -143,14 +143,6 @@ function Model:delCard(id)
   return true
 end
 
------@param column string
------@param statement string | nil
------@param limit_num? number
------@return nil | FsrsTableField[]
---function Model:min(column, statement, limit_num)
---  return self.tbl:min(column, statement)
---end
-
 ---@param table_id string
 ---@return boolean
 function Model:switchTable(table_id)
