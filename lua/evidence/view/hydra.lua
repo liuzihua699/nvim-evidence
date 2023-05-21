@@ -61,7 +61,8 @@ local function WrapListHeads(list, func)
 end
 
 local evidence_hint = [[
- _x_: start _s_: score _f_: find
+ _x_: start _s_: score 
+ _f_: fuzzyFind _m_: minFind
  ^
      _<Esc>_: exit  _q_: exit
 ]]
@@ -76,13 +77,13 @@ local function setup()
 end
 
 local function next()
-  local item = model:get_min_due_item()
+  local item = model:getMinDueItem(1)
   if item == nil then
     print("empty table")
     return
   end
-  now_item = item
-  win_buf:viewContent(item.content)
+  now_item = item[1]
+  win_buf:viewContent(now_item.content)
 end
 
 local function start()
@@ -106,8 +107,12 @@ local function score()
   next()
 end
 
-local function find()
-  telescope.find()
+local function fuzzyFind()
+  telescope.find(telescope.SearchMode.fuzzy)
+end
+
+local function minFind()
+  telescope.find(telescope.SearchMode.min_due)
 end
 
 ---@param data ModelTableInfo
@@ -130,7 +135,8 @@ local setup = function(data)
     heads = {
       { "x",     start },
       { "s",     score },
-      { "f",     find },
+      { "f",     fuzzyFind },
+      { "m",     minFind },
       { "q",     nil,  { exit = true, nowait = true, desc = "exit" } },
       { "<Esc>", nil,  { exit = true, nowait = true } },
     },

@@ -28,8 +28,22 @@ end
 local fn, timer
 local s_prompt = ""
 
+--- @alias SearchModeType integer
+--- @class SearchMode
+local SearchMode = {
+  fuzzy = 0,
+  min_due = 1,
+}
+
+local now_search_mode = SearchMode.fuzzy
+
 local process_work = function(prompt, process_result, process_complete)
-  local x = index:fuzzyFind(prompt, 50)
+  local x = nil
+  if now_search_mode == SearchMode.fuzzy then
+    x = index:fuzzyFind(prompt, 50)
+  elseif now_search_mode == SearchMode.min_due then
+    x = index:getMinDueItem(50)
+  end
   if type(x) ~= "table" then
     s_prompt = ""
     process_complete()
@@ -53,7 +67,7 @@ local async_job = setmetatable({
 }, {
   __call = function(_, prompt, process_result, process_complete)
     s_prompt = prompt
-    if prompt == "" then
+    if prompt == "" and now_search_mode == SearchMode.fuzzy then
       process_complete()
       return
     end
@@ -91,7 +105,7 @@ local function live_fd(opts)
           end,
           define_preview = function(self, entry, status)
             --print(vim.inspect(entry))
-            if s_prompt == "" then
+            if s_prompt == "" and now_search_mode == SearchMode.fuzzy then
               return
             end
             local formTbl = tools.str2table(entry.display)
@@ -118,11 +132,15 @@ local function live_fd(opts)
       :find()
 end
 
-local function find()
+---@param mode? SearchModeType
+local function find(mode)
+  mode = mode or SearchMode.fuzzy
+  now_search_mode = mode
   local opts = {}
   return live_fd(opts)
 end
 
 return {
   find = find,
+  SearchMode = SearchMode,
 }

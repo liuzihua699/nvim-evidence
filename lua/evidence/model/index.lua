@@ -98,16 +98,22 @@ function Model:findAll()
   return self.tbl:find(-1, nil)
 end
 
----@return CardItem|nil
-function Model:get_min_due_item()
-  local item = self.tbl:min("due")
+---@param limit_num? number
+---@return CardItem[]|nil
+function Model:getMinDueItem(limit_num)
+  print("getMinDueItem")
+  local item = self.tbl:min("due", nil, limit_num)
   if item ~= nil then
-    return {
-      id = item.id,
-      content = item.content,
-      due = item.due,
-      card = self:convertRealCard(item),
-    }
+    local arr = {}
+    for _, v in ipairs(item) do
+      table.insert(arr, {
+        id = v.id,
+        content = v.content,
+        due = v.due,
+        card = self:convertRealCard(v),
+      })
+    end
+    return arr
   else
     return nil
   end
@@ -137,12 +143,13 @@ function Model:delCard(id)
   return true
 end
 
----@param column string
----@param statement string | nil
----@return nil | FsrsTableField
-function Model:min(column, statement)
-  return self.tbl:min(column, statement)
-end
+-----@param column string
+-----@param statement string | nil
+-----@param limit_num? number
+-----@return nil | FsrsTableField[]
+--function Model:min(column, statement, limit_num)
+--  return self.tbl:min(column, statement)
+--end
 
 ---@param table_id string
 ---@return boolean
