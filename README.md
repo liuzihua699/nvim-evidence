@@ -43,6 +43,8 @@ fsrs plugin for nvim
 }
 ```
 
+`<Leader>E` 启动hydra
+
 ### Hydra + Telescope
 
 - a: add
@@ -97,6 +99,8 @@ Views (WinBuf, Telescope, Hydra)
 
 - 双面buffer显示答案
 
-- hydra outer
+- hydra outer 
+
+- hydra change to modern menu
 
 - lru最近访问过的卡片
