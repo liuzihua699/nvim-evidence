@@ -94,3 +94,5 @@ Views (WinBuf, Telescope, Hydra)
 - 所有牌组随机抽
 
 - 撤销
+
+- 双面buffer显示答案
