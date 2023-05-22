@@ -96,3 +96,5 @@ Views (WinBuf, Telescope, Hydra)
 - 撤销
 
 - 双面buffer显示答案
+
+- hydra outer

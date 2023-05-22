@@ -204,7 +204,7 @@ local setup = function(data)
       },
     },
     mode = "n",
-    body = "<Leader>O",
+    body = "<Leader>E",
     heads = {
       { "x", start },
       { "a", add },
