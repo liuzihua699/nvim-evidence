@@ -40,7 +40,7 @@ local function WrapHydra(name, hint, heads)
       },
     },
     heads = tools.table_concat(heads, {
-      { "q",     nil, { exit = true, nowait = true, desc = "exit" } },
+      { "q", nil, { exit = true, nowait = true, desc = "exit" } },
       { "<Esc>", nil, { exit = true, nowait = true } },
     }),
   })
@@ -167,7 +167,9 @@ local function switchTable()
   setup()
   local tables = model:getTableIds()
   local drillHeads = WrapListHeads(tables, function(id)
-    model:switchTable(tables[id])
+    local now_table_id = tables[id]
+    model:switchTable(now_table_id)
+    user_data.now_table_id = now_table_id
   end)
   local drill_hint = hint_list("drill table", tables)
   local drill_table_hydra = WrapHydra("drill_table_hydra", drill_hint, drillHeads)
@@ -204,16 +206,16 @@ local setup = function(data)
     mode = "n",
     body = "<Leader>O",
     heads = {
-      { "x",     start },
-      { "a",     add },
-      { "s",     score },
-      { "f",     fuzzyFind },
-      { "m",     minFind },
-      { "e",     edit },
-      { "d",     delete },
-      { "t",     switchTable, { exit = true, nowait = true, desc = "exit" } },
-      { "q",     nil,         { exit = true, nowait = true, desc = "exit" } },
-      { "<Esc>", nil,         { exit = true, nowait = true } },
+      { "x", start },
+      { "a", add },
+      { "s", score },
+      { "f", fuzzyFind },
+      { "m", minFind },
+      { "e", edit },
+      { "d", delete },
+      { "t", switchTable, { exit = true, nowait = true, desc = "exit" } },
+      { "q", nil, { exit = true, nowait = true, desc = "exit" } },
+      { "<Esc>", nil, { exit = true, nowait = true } },
     },
   })
 end
