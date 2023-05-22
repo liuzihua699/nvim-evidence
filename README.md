@@ -98,3 +98,5 @@ Views (WinBuf, Telescope, Hydra)
 - 双面buffer显示答案
 
 - hydra outer
+
+- lru最近访问过的卡片
